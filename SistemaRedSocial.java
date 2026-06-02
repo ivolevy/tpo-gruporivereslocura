@@ -30,6 +30,7 @@ public class SistemaRedSocial extends JFrame {
     JTextField txtBuscarId;
     JTextField txtHabilidad;
     JTextField txtBuscarEspecialidad;
+    JTextField txtHabilidadesRequeridas;
 
     Color colorFondo = new Color(245, 245, 245);
     Color colorPanel = new Color(255, 255, 255);
@@ -152,7 +153,7 @@ public class SistemaRedSocial extends JFrame {
         redContactos = new Grafo(200);
 
         setTitle("Ecosistema Red Social Profesional - Edición Moriste en Madrid");
-        setSize(850, 720);
+        setSize(850, 780);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -736,6 +737,33 @@ public class SistemaRedSocial extends JFrame {
         gbc.gridy = 6;
         form.add(btnProcesar, gbc);
 
+        JSeparator sep2 = new JSeparator();
+        sep2.setForeground(colorBordePanel);
+        gbc.gridy = 7;
+        form.add(sep2, gbc);
+
+        JLabel lblIdeal = new JLabel("Candidatos Ideales");
+        lblIdeal.setFont(fontTitulo);
+        lblIdeal.setForeground(colorBoton);
+        gbc.gridy = 8;
+        form.add(lblIdeal, gbc);
+
+        JLabel lblReq = new JLabel("Habilidades (Separadas por comas):");
+        lblReq.setFont(fontNegrita);
+        lblReq.setForeground(colorTexto);
+        gbc.gridy = 9;
+        form.add(lblReq, gbc);
+
+        txtHabilidadesRequeridas = new JTextField();
+        styleTextField(txtHabilidadesRequeridas);
+        gbc.gridy = 10;
+        form.add(txtHabilidadesRequeridas, gbc);
+
+        JButton btnBuscarIdeales = new JButton("Buscar Candidatos");
+        styleButton(btnBuscarIdeales, colorBoton);
+        gbc.gridy = 11;
+        form.add(btnBuscarIdeales, gbc);
+
         areaEmpleos = new JTextArea();
         styleTextArea(areaEmpleos);
         JScrollPane scroll = new JScrollPane(areaEmpleos);
@@ -784,7 +812,51 @@ public class SistemaRedSocial extends JFrame {
             }
         });
 
+        btnBuscarIdeales.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent eventArgs) {
+                String input = txtHabilidadesRequeridas.getText().trim();
+                if (input.isEmpty()) {
+                    JOptionPane.showMessageDialog(SistemaRedSocial.this, "Ingrese al menos una habilidad.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                String[] habs = input.split(",");
+                for (int i = 0; i < habs.length; i++) {
+                    habs[i] = habs[i].trim();
+                }
+                Conjunto candidatos = buscarCandidatosIdeales(habs);
+                StringBuilder sb = new StringBuilder();
+                sb.append("=== CANDIDATOS IDEALES PARA: ").append(input).append(" ===\n\n");
+                if (candidatos == null || candidatos.cantidad == 0) {
+                    sb.append("(No se encontraron candidatos con todas las habilidades requeridas)\n");
+                } else {
+                    for (int i = 0; i < candidatos.cantidad; i++) {
+                        int id = candidatos.elementos[i];
+                        Perfil p = perfiles.recuperar(id);
+                        if (p != null) {
+                            sb.append("- ").append(p.nombre).append(" (ID ").append(id).append(" - ").append(p.profesion).append(")\n");
+                        } else {
+                            sb.append("- ID: ").append(id).append("\n");
+                        }
+                    }
+                }
+                areaEmpleos.setText(sb.toString() + "\n\n" + areaEmpleos.getText());
+            }
+        });
+
         return main;
+    }
+
+    public Conjunto buscarCandidatosIdeales(String[] habilidadesRequeridas) {
+        if (habilidadesRequeridas == null || habilidadesRequeridas.length == 0) {
+            return new Conjunto();
+        }
+        Conjunto resultado = habilidades.obtenerUsuariosPorHabilidad(habilidadesRequeridas[0]);
+        for (int i = 1; i < habilidadesRequeridas.length; i++) {
+            Conjunto temp = habilidades.obtenerUsuariosPorHabilidad(habilidadesRequeridas[i]);
+            resultado = resultado.interseccion(temp);
+        }
+        return resultado;
     }
 
     private JPanel crearPanelHistorial() {

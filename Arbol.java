@@ -61,6 +61,17 @@ public class Arbol {
         return sb.toString();
     }
 
+    public Conjunto obtenerUsuariosPorHabilidad(String habilidad) {
+        NodoArbol resultado = buscarRecursivo(raiz, habilidad);
+        Conjunto conjunto = new Conjunto();
+        if (resultado != null) {
+            for (int i = 0; i < resultado.cantidadIds; i++) {
+                conjunto.agregar(resultado.idsUsuarios[i]);
+            }
+        }
+        return conjunto;
+    }
+
     private NodoArbol buscarRecursivo(NodoArbol nodo, String habilidad) {
         if (nodo == null || habilidad.equals(nodo.habilidad)) {
             return nodo;
