@@ -17,6 +17,42 @@ public class Grafo {
         matriz[j][i] = 1;
     }
 
+    public void desconectar(int i, int j) {
+        matriz[i][j] = 0;
+        matriz[j][i] = 0;
+    }
+
+    public int gradoSeparacion(int inicio, int fin) {
+        if (inicio == fin) return 0;
+        boolean[] visitado = new boolean[numVertices];
+        int[] distancia = new int[numVertices];
+        ColaInt cola = new ColaInt(numVertices);
+
+        for (int i = 0; i < numVertices; i++) {
+            visitado[i] = false;
+            distancia[i] = -1;
+        }
+
+        visitado[inicio] = true;
+        distancia[inicio] = 0;
+        cola.encolar(inicio);
+
+        while (!cola.estaVacia()) {
+            int actual = cola.desencolar();
+            if (actual == fin) {
+                return distancia[actual];
+            }
+            for (int i = 0; i < numVertices; i++) {
+                if (matriz[actual][i] == 1 && !visitado[i]) {
+                    visitado[i] = true;
+                    distancia[i] = distancia[actual] + 1;
+                    cola.encolar(i);
+                }
+            }
+        }
+        return -1; // No conectados
+    }
+
     public String sugerirContactosBFS(int inicio) {
         boolean[] visitado = new boolean[numVertices];
         int[] nivel = new int[numVertices];

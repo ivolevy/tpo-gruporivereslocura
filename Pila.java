@@ -1,13 +1,13 @@
 public class Pila {
-    String[] datos;
+    Accion[] datos;
     int tope;
 
     public Pila(int max) {
-        datos = new String[max];
+        datos = new Accion[max];
         tope = -1;
     }
 
-    public boolean apilar(String accion) {
+    public boolean apilar(Accion accion) {
         if (tope < datos.length - 1) {
             tope++;
             datos[tope] = accion;
@@ -16,9 +16,9 @@ public class Pila {
         return false;
     }
 
-    public String desapilar() {
+    public Accion desapilar() {
         if (tope >= 0) {
-            String x = datos[tope];
+            Accion x = datos[tope];
             tope--;
             return x;
         }

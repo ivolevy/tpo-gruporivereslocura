@@ -72,6 +72,22 @@ public class Arbol {
         return conjunto;
     }
 
+    public boolean eliminarUsuarioDeHabilidad(String habilidad, int idUsuario) {
+        NodoArbol nodo = buscarRecursivo(raiz, habilidad);
+        if (nodo != null) {
+            for (int i = 0; i < nodo.cantidadIds; i++) {
+                if (nodo.idsUsuarios[i] == idUsuario) {
+                    for (int j = i; j < nodo.cantidadIds - 1; j++) {
+                        nodo.idsUsuarios[j] = nodo.idsUsuarios[j + 1];
+                    }
+                    nodo.cantidadIds--;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private NodoArbol buscarRecursivo(NodoArbol nodo, String habilidad) {
         if (nodo == null || habilidad.equals(nodo.habilidad)) {
             return nodo;

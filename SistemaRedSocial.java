@@ -16,6 +16,8 @@ public class SistemaRedSocial extends JFrame {
     JComboBox<String> comboUserInicio;
     JComboBox<String> comboPostulante;
     JComboBox<String> comboUserHab;
+    JComboBox<String> comboUserSepA;
+    JComboBox<String> comboUserSepB;
 
     JTextArea areaPerfiles;
     JTextArea areaContactos;
@@ -191,7 +193,7 @@ public class SistemaRedSocial extends JFrame {
         perfiles.insertar(101, new Perfil(101, "Juan", "Desarrollador Java"));
         perfiles.insertar(102, new Perfil(102, "Ana", "UX/UI Designer"));
         perfiles.insertar(103, new Perfil(103, "Pedro", "QA Engineer"));
-        historial.apilar("Se cargaron los perfiles iniciales.");
+        historial.apilar(new Accion(null, null, "Se cargaron los perfiles iniciales."));
         
         redContactos.conectar(101, 102);
         redContactos.conectar(102, 103);
@@ -345,7 +347,11 @@ public class SistemaRedSocial extends JFrame {
                         return;
                     }
                     habilidades.insertar(habilidad, id);
-                    boolean apilado = historial.apilar("Se registró a " + nombre + " con ID " + id + " y habilidad " + habilidad + ".");
+                    boolean apilado = historial.apilar(new Accion(
+                        Accion.Tipo.REGISTRAR_PERFIL,
+                        new Object[]{ id, habilidad },
+                        "Se registró a " + nombre + " con ID " + id + " y habilidad " + habilidad + "."
+                    ));
                     if (!apilado) {
                         JOptionPane.showMessageDialog(SistemaRedSocial.this, "Advertencia: El historial de acciones está lleno. La acción se completó pero no se podrá deshacer.", "Advertencia", JOptionPane.WARNING_MESSAGE);
                     }
@@ -462,6 +468,44 @@ public class SistemaRedSocial extends JFrame {
         gbc.gridy = 10;
         form.add(btnBuscarBFS, gbc);
 
+        JSeparator sep2 = new JSeparator();
+        sep2.setForeground(colorBordePanel);
+        gbc.gridy = 11;
+        form.add(sep2, gbc);
+
+        JLabel lblSep = new JLabel("Grado de Separación");
+        lblSep.setFont(fontTitulo);
+        lblSep.setForeground(colorBoton);
+        gbc.gridy = 12;
+        form.add(lblSep, gbc);
+
+        JLabel lblUserSepA = new JLabel("Usuario Origen:");
+        lblUserSepA.setFont(fontNegrita);
+        lblUserSepA.setForeground(colorTexto);
+        gbc.gridy = 13;
+        form.add(lblUserSepA, gbc);
+
+        comboUserSepA = new JComboBox<>();
+        styleComboBox(comboUserSepA);
+        gbc.gridy = 14;
+        form.add(comboUserSepA, gbc);
+
+        JLabel lblUserSepB = new JLabel("Usuario Destino:");
+        lblUserSepB.setFont(fontNegrita);
+        lblUserSepB.setForeground(colorTexto);
+        gbc.gridy = 15;
+        form.add(lblUserSepB, gbc);
+
+        comboUserSepB = new JComboBox<>();
+        styleComboBox(comboUserSepB);
+        gbc.gridy = 16;
+        form.add(comboUserSepB, gbc);
+
+        JButton btnCalcularSep = new JButton("Calcular Grado");
+        styleButton(btnCalcularSep, colorBoton);
+        gbc.gridy = 17;
+        form.add(btnCalcularSep, gbc);
+
         areaContactos = new JTextArea();
         styleTextArea(areaContactos);
         JScrollPane scroll = new JScrollPane(areaContactos);
@@ -469,6 +513,36 @@ public class SistemaRedSocial extends JFrame {
 
         main.add(form, BorderLayout.WEST);
         main.add(scroll, BorderLayout.CENTER);
+
+        btnCalcularSep.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent eventArgs) {
+                String itemA = (String) comboUserSepA.getSelectedItem();
+                String itemB = (String) comboUserSepB.getSelectedItem();
+                if (itemA == null || itemB == null) {
+                    JOptionPane.showMessageDialog(SistemaRedSocial.this, "Seleccione dos perfiles.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                int idA = Integer.parseInt(itemA.split(" - ")[0]);
+                int idB = Integer.parseInt(itemB.split(" - ")[0]);
+                if (idA == idB) {
+                    JOptionPane.showMessageDialog(SistemaRedSocial.this, "Seleccione dos perfiles distintos.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                int grado = redContactos.gradoSeparacion(idA, idB);
+                String resultText;
+                if (grado == -1) {
+                    resultText = "No existe conexión entre " + itemA + " y " + itemB + ".";
+                } else if (grado == 1) {
+                    resultText = "El grado de separación entre " + itemA + " y " + itemB + " es 1 (Amigos directos).";
+                } else if (grado == 2) {
+                    resultText = "El grado de separación entre " + itemA + " y " + itemB + " es 2 (Amigos de amigos).";
+                } else {
+                    resultText = "El grado de separación entre " + itemA + " y " + itemB + " es " + grado + ".";
+                }
+                areaContactos.setText("=== GRADO DE SEPARACIÓN ===\n" + resultText + "\n\n" + areaContactos.getText());
+            }
+        });
 
         btnConectar.addActionListener(new ActionListener() {
             @Override
@@ -490,7 +564,11 @@ public class SistemaRedSocial extends JFrame {
                     return;
                 }
                 redContactos.conectar(idA, idB);
-                boolean apilado = historial.apilar("Se conectó el ID " + idA + " con el ID " + idB + ".");
+                boolean apilado = historial.apilar(new Accion(
+                    Accion.Tipo.CONECTAR_CONTACTOS,
+                    new Object[]{ idA, idB },
+                    "Se conectó el ID " + idA + " con el ID " + idB + "."
+                ));
                 if (!apilado) {
                     JOptionPane.showMessageDialog(SistemaRedSocial.this, "Advertencia: El historial de acciones está lleno. La acción se completó pero no se podrá deshacer.", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 }
@@ -528,7 +606,11 @@ public class SistemaRedSocial extends JFrame {
                     }
                 }
                 areaContactos.setText(sb.toString() + "\n" + areaContactos.getText());
-                boolean apilado = historial.apilar("Búsqueda BFS realizada para el ID " + id + ".");
+                boolean apilado = historial.apilar(new Accion(
+                    null,
+                    null,
+                    "Búsqueda BFS realizada para el ID " + id + "."
+                ));
                 if (!apilado) {
                     JOptionPane.showMessageDialog(SistemaRedSocial.this, "Advertencia: El historial de acciones está lleno. La acción se completó pero no se podrá deshacer.", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 }
@@ -636,7 +718,11 @@ public class SistemaRedSocial extends JFrame {
                 }
                 int userId = Integer.parseInt(item.split(" - ")[0]);
                 habilidades.insertar(hab, userId);
-                boolean apilado = historial.apilar("Se insertó la habilidad '" + hab + "' asociada al usuario " + userId + ".");
+                boolean apilado = historial.apilar(new Accion(
+                    Accion.Tipo.AGREGAR_HABILIDAD,
+                    new Object[]{ hab, userId },
+                    "Se insertó la habilidad '" + hab + "' asociada al usuario " + userId + "."
+                ));
                 if (!apilado) {
                     JOptionPane.showMessageDialog(SistemaRedSocial.this, "Advertencia: El historial de acciones está lleno. La acción se completó pero no se podrá deshacer.", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 }
@@ -785,7 +871,11 @@ public class SistemaRedSocial extends JFrame {
                     JOptionPane.showMessageDialog(SistemaRedSocial.this, "No se pudo encolar. La cola de postulaciones está llena.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                boolean apilado = historial.apilar("Se encoló la postulación de " + item + ".");
+                boolean apilado = historial.apilar(new Accion(
+                    Accion.Tipo.ENCOLAR_POSTULACION,
+                    new Object[]{ item },
+                    "Se encoló la postulación de " + item + "."
+                ));
                 if (!apilado) {
                     JOptionPane.showMessageDialog(SistemaRedSocial.this, "Advertencia: El historial de acciones está lleno. La acción se completó pero no se podrá deshacer.", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 }
@@ -802,7 +892,11 @@ public class SistemaRedSocial extends JFrame {
                     return;
                 }
                 String postulado = postulaciones.desencolar();
-                boolean apilado = historial.apilar("Se procesó la postulación de " + postulado + ".");
+                boolean apilado = historial.apilar(new Accion(
+                    Accion.Tipo.PROCESAR_POSTULACION,
+                    new Object[]{ postulado },
+                    "Se procesó la postulación de " + postulado + "."
+                ));
                 if (!apilado) {
                     JOptionPane.showMessageDialog(SistemaRedSocial.this, "Advertencia: El historial de acciones está lleno. La acción se completó pero no se podrá deshacer.", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 }
@@ -903,13 +997,60 @@ public class SistemaRedSocial extends JFrame {
                     JOptionPane.showMessageDialog(SistemaRedSocial.this, "No hay acciones para deshacer en la pila.", "Información", JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
-                String accion = historial.desapilar();
-                JOptionPane.showMessageDialog(SistemaRedSocial.this, "Acción revertida:\n" + accion, "Pila LIFO", JOptionPane.INFORMATION_MESSAGE);
-                actualizarAreaHistorial();
+                Accion accion = historial.desapilar();
+                if (accion != null) {
+                    revertirAccion(accion);
+                    JOptionPane.showMessageDialog(SistemaRedSocial.this, "Acción revertida:\n" + accion.descripcion, "Pila LIFO", JOptionPane.INFORMATION_MESSAGE);
+                    actualizarAreaPerfiles();
+                    actualizarAreaContactos();
+                    actualizarAreaHabilidades();
+                    actualizarAreaEmpleos();
+                    actualizarAreaHistorial();
+                    actualizarCombos();
+                }
             }
         });
 
         return main;
+    }
+
+    private void revertirAccion(Accion accion) {
+        if (accion.tipo == null) {
+            return;
+        }
+        switch (accion.tipo) {
+            case REGISTRAR_PERFIL: {
+                int id = (Integer) accion.datos[0];
+                String habilidad = (String) accion.datos[1];
+                perfiles.eliminar(id);
+                habilidades.eliminarUsuarioDeHabilidad(habilidad, id);
+                for (int i = 0; i < redContactos.numVertices; i++) {
+                    redContactos.desconectar(id, i);
+                }
+                break;
+            }
+            case CONECTAR_CONTACTOS: {
+                int idA = (Integer) accion.datos[0];
+                int idB = (Integer) accion.datos[1];
+                redContactos.desconectar(idA, idB);
+                break;
+            }
+            case AGREGAR_HABILIDAD: {
+                String habilidad = (String) accion.datos[0];
+                int id = (Integer) accion.datos[1];
+                habilidades.eliminarUsuarioDeHabilidad(habilidad, id);
+                break;
+            }
+            case ENCOLAR_POSTULACION: {
+                postulaciones.removerUltimo();
+                break;
+            }
+            case PROCESAR_POSTULACION: {
+                String postulado = (String) accion.datos[0];
+                postulaciones.encolarFrente(postulado);
+                break;
+            }
+        }
     }
 
     private void styleTextField(JTextField f) {
@@ -953,9 +1094,11 @@ public class SistemaRedSocial extends JFrame {
         comboUserInicio.removeAllItems();
         comboPostulante.removeAllItems();
         comboUserHab.removeAllItems();
+        if (comboUserSepA != null) comboUserSepA.removeAllItems();
+        if (comboUserSepB != null) comboUserSepB.removeAllItems();
 
         for (int i = 0; i < perfiles.datos.length; i++) {
-            if (perfiles.datos[i] != null) {
+            if (perfiles.datos[i] != null && !perfiles.datos[i].borrado) {
                 Perfil p = perfiles.datos[i].valor;
                 String val = p.id + " - " + p.nombre;
                 comboUserA.addItem(val);
@@ -963,6 +1106,8 @@ public class SistemaRedSocial extends JFrame {
                 comboUserInicio.addItem(val);
                 comboPostulante.addItem(val);
                 comboUserHab.addItem(val);
+                if (comboUserSepA != null) comboUserSepA.addItem(val);
+                if (comboUserSepB != null) comboUserSepB.addItem(val);
             }
         }
     }
@@ -972,7 +1117,7 @@ public class SistemaRedSocial extends JFrame {
         sb.append("=== PERFILES REGISTRADOS ===\n\n");
         int count = 0;
         for (int i = 0; i < perfiles.datos.length; i++) {
-            if (perfiles.datos[i] != null) {
+            if (perfiles.datos[i] != null && !perfiles.datos[i].borrado) {
                 sb.append(perfiles.datos[i].valor.toString()).append("\n");
                 count++;
             }

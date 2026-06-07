@@ -19,7 +19,7 @@ public class Diccionario {
         int pos = hash(clave);
         int inicio = pos;
         while (datos[pos] != null) {
-            if (datos[pos].clave == clave) {
+            if (!datos[pos].borrado && datos[pos].clave == clave) {
                 return pos;
             }
             pos = (pos + 1) % datos.length;
@@ -33,7 +33,7 @@ public class Diccionario {
     public boolean insertar(int clave, Perfil valor) {
         if (cant < datos.length && buscarPosicion(clave) == -1) {
             int pos = hash(clave);
-            while (datos[pos] != null) {
+            while (datos[pos] != null && !datos[pos].borrado) {
                 pos = (pos + 1) % datos.length;
             }
             datos[pos] = new Par(clave, valor);
@@ -49,5 +49,16 @@ public class Diccionario {
             return datos[pos].valor;
         }
         return null;
+    }
+
+    public boolean eliminar(int clave) {
+        int pos = buscarPosicion(clave);
+        if (pos != -1) {
+            datos[pos].borrado = true;
+            datos[pos].valor = null;
+            cant--;
+            return true;
+        }
+        return false;
     }
 }
