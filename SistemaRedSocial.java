@@ -11,13 +11,13 @@ public class SistemaRedSocial extends JFrame {
     Arbol habilidades;
     Grafo redContactos;
 
-    JComboBox<String> comboUserA;
-    JComboBox<String> comboUserB;
-    JComboBox<String> comboUserInicio;
-    JComboBox<String> comboPostulante;
-    JComboBox<String> comboUserHab;
-    JComboBox<String> comboUserSepA;
-    JComboBox<String> comboUserSepB;
+    JComboBox comboUserA;
+    JComboBox comboUserB;
+    JComboBox comboUserInicio;
+    JComboBox comboPostulante;
+    JComboBox comboUserHab;
+    JComboBox comboUserSepA;
+    JComboBox comboUserSepB;
 
     JTextArea areaPerfiles;
     JTextArea areaContactos;
@@ -420,7 +420,7 @@ public class SistemaRedSocial extends JFrame {
         gbc.gridy = 1;
         form.add(lblUserA, gbc);
 
-        comboUserA = new JComboBox<>();
+        comboUserA = new JComboBox();
         styleComboBox(comboUserA);
         gbc.gridy = 2;
         form.add(comboUserA, gbc);
@@ -431,7 +431,7 @@ public class SistemaRedSocial extends JFrame {
         gbc.gridy = 3;
         form.add(lblUserB, gbc);
 
-        comboUserB = new JComboBox<>();
+        comboUserB = new JComboBox();
         styleComboBox(comboUserB);
         gbc.gridy = 4;
         form.add(comboUserB, gbc);
@@ -458,7 +458,7 @@ public class SistemaRedSocial extends JFrame {
         gbc.gridy = 8;
         form.add(lblUserInicio, gbc);
 
-        comboUserInicio = new JComboBox<>();
+        comboUserInicio = new JComboBox();
         styleComboBox(comboUserInicio);
         gbc.gridy = 9;
         form.add(comboUserInicio, gbc);
@@ -485,7 +485,7 @@ public class SistemaRedSocial extends JFrame {
         gbc.gridy = 13;
         form.add(lblUserSepA, gbc);
 
-        comboUserSepA = new JComboBox<>();
+        comboUserSepA = new JComboBox();
         styleComboBox(comboUserSepA);
         gbc.gridy = 14;
         form.add(comboUserSepA, gbc);
@@ -496,7 +496,7 @@ public class SistemaRedSocial extends JFrame {
         gbc.gridy = 15;
         form.add(lblUserSepB, gbc);
 
-        comboUserSepB = new JComboBox<>();
+        comboUserSepB = new JComboBox();
         styleComboBox(comboUserSepB);
         gbc.gridy = 16;
         form.add(comboUserSepB, gbc);
@@ -662,7 +662,7 @@ public class SistemaRedSocial extends JFrame {
         gbc.gridy = 3;
         form.add(lblUserAsoc, gbc);
 
-        comboUserHab = new JComboBox<>();
+        comboUserHab = new JComboBox();
         styleComboBox(comboUserHab);
         gbc.gridy = 4;
         form.add(comboUserHab, gbc);
@@ -797,7 +797,7 @@ public class SistemaRedSocial extends JFrame {
         gbc.gridy = 1;
         form.add(lblPost, gbc);
 
-        comboPostulante = new JComboBox<>();
+        comboPostulante = new JComboBox();
         styleComboBox(comboPostulante);
         gbc.gridy = 2;
         form.add(comboPostulante, gbc);
@@ -1074,7 +1074,7 @@ public class SistemaRedSocial extends JFrame {
         b.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
     }
 
-    private void styleComboBox(JComboBox<String> c) {
+    private void styleComboBox(JComboBox c) {
         c.setFont(fontGlobal);
         c.setBackground(Color.WHITE);
         c.setForeground(new Color(33, 37, 41));

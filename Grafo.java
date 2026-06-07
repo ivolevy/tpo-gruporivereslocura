@@ -50,7 +50,7 @@ public class Grafo {
                 }
             }
         }
-        return -1; // No conectados
+        return -1;
     }
 
     public String sugerirContactosBFS(int inicio) {
