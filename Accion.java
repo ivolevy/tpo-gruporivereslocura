@@ -16,4 +16,8 @@ public class Accion {
         this.datos = datos;
         this.descripcion = descripcion;
     }
+
+    public String toString() {
+        return descripcion;
+    }
 }
